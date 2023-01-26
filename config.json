@@ -8,5 +8,8 @@
     "voice": {
         "frequency": 2500,
         "duration": 1000
+    },
+    "request": {
+        "delay": 1000
     }
 }

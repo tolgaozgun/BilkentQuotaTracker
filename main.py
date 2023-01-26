@@ -18,6 +18,7 @@ speak = Dispatch("SAPI.SpVoice").Speak
 courses = {}
 frequency = 2500
 duration = 1000
+delay = 1
 
 
 def print_with_time(message: str):
@@ -31,6 +32,7 @@ def section_id_filler(id: str):
         id = "0" + id
     return id
 
+
 def failed_response_handler(response_code: int):
     if response_code == 200:
         return
@@ -38,7 +40,8 @@ def failed_response_handler(response_code: int):
     if response_code == 429:
         print_with_time(f"Request marked as spam, retrying in a second.")
     else:
-        print_with_time(f"Connection error to servers, check your connection! Retrying in a second. [{response_code}]")
+        print_with_time(f"Connection error to servers, check your connection! Retrying in {delay} second(s)."
+                        f"Error code: [{response_code}]")
 
 
 def remove_section(course_code: str, section_id: int):
@@ -66,7 +69,9 @@ def find_course(course_code: str, section_ids):
     while response_code != 200:
         r = requests.get(URL)
         response_code = r.status_code
-        failed_response_handler(response_code)
+        if response_code != 200:
+            failed_response_handler(response_code)
+            time.sleep(delay)
 
     if r.text.__contains__("no section"):
         print_with_time(f"Course does not exist: {course_code}. Removing this course for now")
@@ -87,8 +92,6 @@ def find_course(course_code: str, section_ids):
         if quota == 0:
             continue
         else:
-            frequency = 2500  # Set Frequency To 2500 Hertz
-            duration = 1000  # Set Duration To 1000 ms == 1 second
             winsound.Beep(frequency, duration)
             print_with_time(f"Course {table_id} has {quota} quota!")
             speak(f"Course {table_id} has {quota} quota!")
@@ -100,6 +103,7 @@ def read_config():
 
         global frequency
         global duration
+        global delay
 
         if data["voice"]["frequency"] and int(data["voice"]["frequency"]) is not None:
             frequency = int(data["voice"]["frequency"])
@@ -112,6 +116,13 @@ def read_config():
         else:
             print(f"Error reading voice duration from config.")
         print(f"Voice duration set to: {duration}")
+
+        # Convert delay in milliseconds to seconds
+        if data["request"]["delay"] and float(data["request"]["delay"]) is not None:
+            delay = float(data["request"]["delay"]) / 1000.0
+        else:
+            print(f"Error reading request delay from config.")
+        print(f"Delay is set to: {delay}")
 
         if not data["courses"] or len(data["courses"]) == 0:
             print_with_time("No courses added to config!")
@@ -141,7 +152,7 @@ def main():
                 section_ids = courses[course]
                 find_course(course, section_ids)
                 # Wait for one second until the next course.
-                time.sleep(1)
+                time.sleep(delay)
 
         except Exception as e:
             print(e)
