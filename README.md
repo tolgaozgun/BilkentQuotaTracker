@@ -27,4 +27,4 @@ If you have any feature requests or encounter any bugs, please open an issue on 
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the Creative Commons License. See the [LICENSE](LICENSE) file for details.
