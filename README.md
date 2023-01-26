@@ -13,6 +13,8 @@ This is a tool for Bilkent University students to track the remaining quotas for
 1. Run the script: `python main.py`
 2. Your remaining quotas for the specified courses and sections will be displayed on the command line
 3. If available, an audio alert will also be played with the frequency and duration specified in the config file
+4. There is an optional `"delay"` field in the config file that is in milliseconds and it indicates the time delay between each URL request. It is not advised to make it any lower than 1000, which may result in getting blocked from Bilkent network.
+
 
 ## Note
 
