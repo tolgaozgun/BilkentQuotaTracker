@@ -1,6 +1,6 @@
 # Bilkent Quota Tracker
 
-This is a tool for Bilkent University students to track the remaining quotas for their courses on the university's online registration system.
+This is a tool for Bilkent University students to track the remaining quotas for their courses on the university's online registration system. It supports adding non-existing courses or non-existing sections of existing courses. It will alert the user if the section or the course does not exist, and for optimization it will not check those sections and/or courses for that run.
 
 ## Installation
 
@@ -27,4 +27,4 @@ If you have any feature requests or encounter any bugs, please open an issue on 
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the Creative Commons License. See the [LICENSE](LICENSE) file for details.
