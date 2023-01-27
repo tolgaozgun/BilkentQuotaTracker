@@ -90,7 +90,7 @@ def find_course(course_code: str, section_ids):
         if quota == 0:
             continue
         else:
-            winsound.Beep(frequency, duration)
+            beep(frequency=frequency, duration=duration)
             print_with_time(f"Course {table_id} has {quota} quota!")
             speech_engine.say(f"Course {table_id} has {quota} quota!")
 
@@ -168,6 +168,34 @@ def read_config():
             courses[course] = sections
             print()
 
+'''
+    A cross platform beep function that simply plays a beep sound when a course has quota.
+    - For Windows, the function uses the Beep API that comes with the winsound library.
+    - For Linux it uses the alert flag: '\a'. The alert flag is written by means of a shell
+    command.
+    - For MacOS it follows a similar approach with Linux's approach. The "say beep" command
+    is written in the terminal. 
+'''
+def beep(**kwargs):
+    cur_os = platform.system()
+    if "Windows" in cur_os:
+        frequency = kwargs.get("frequency", None)
+        duration = kwargs.get("duration", None)
+
+        if not frequency:
+            frequency = 2500
+            duration = 1000
+
+        winsound.Beep(frequency, duration)
+
+    elif "Linux" in cur_os:
+        # https://stackoverflow.com/questions/6537481/python-making-a-beep-noise
+        beep = lambda x: os.system("echo -n '\a';sleep 0.2;" * x)
+        beep(3)
+    elif "Darwin" in cur_os:
+        os.system('say beep')
+    else:
+        raise OSError(f"Expected 'Windows', 'Linux', or 'Darwin'. Received {cur_os}")
 
 def main():
     read_config()
