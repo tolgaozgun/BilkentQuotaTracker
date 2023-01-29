@@ -1,15 +1,17 @@
 {
     "courses": {
-        "MATH 2399": ["1", "2"],
-        "MATH 230": ["6"],
-        "HUM 111": ["1"],
-        "HUM 331": ["1"]
+        "CS 101": ["1"],
+        "CS 464": ["1"],
+        "CS 342": ["2", "3"]
     },
     "voice": {
         "frequency": 2500,
-        "duration": 1000
+        "duration": 1000,
+        "voice": "female",
+        "rate": 200,
+        "volume": 1.0
     },
     "request": {
-        "delay": 1000
+        "delay": 2000
     }
 }
