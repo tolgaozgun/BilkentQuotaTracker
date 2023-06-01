@@ -5,21 +5,18 @@
 #   https://github.com/tolgaozgun
 #
 
-import requests
-from bs4 import BeautifulSoup
-import time
+import time, sys, json, requests, platform, os
 from datetime import datetime
-import winsound
-from win32com.client import Dispatch
-import json
-
-speak = Dispatch("SAPI.SpVoice").Speak
+from bs4 import BeautifulSoup
+import beepy
+from speech_handler import SpeechHandler
 
 courses = {}
 frequency = 2500
 duration = 1000
 delay = 1
 
+speech_engine = None
 
 def print_with_time(message: str):
     t = datetime.now()
@@ -58,6 +55,7 @@ def remove_section(course_code: str, section_id: int):
 
 def find_course(course_code: str, section_ids):
     global r
+    global speech_engine
     final_sections = []
 
     for section_id in section_ids:
@@ -92,19 +90,21 @@ def find_course(course_code: str, section_ids):
         if quota == 0:
             continue
         else:
-            winsound.Beep(frequency, duration)
+            beep(frequency=frequency, duration=duration)
             print_with_time(f"Course {table_id} has {quota} quota!")
-            speak(f"Course {table_id} has {quota} quota!")
+            speech_engine.say(f"Course {table_id} has {quota} quota!")
 
 
 def read_config():
     with open("config.json", "r") as json_file:
         data = json.load(json_file)
 
+        global speech_engine
         global frequency
         global duration
         global delay
 
+        # Read Beep API config
         if data["voice"]["frequency"] and int(data["voice"]["frequency"]) is not None:
             frequency = int(data["voice"]["frequency"])
         else:
@@ -116,6 +116,34 @@ def read_config():
         else:
             print(f"Error reading voice duration from config.")
         print(f"Voice duration set to: {duration}")
+
+        # Read voice-over library config
+        if data["voice"]["voice"] and data["voice"]["voice"] is not None and data["voice"]["voice"] in ["male", "female", "neutral"]:
+            voice = data["voice"]["voice"]
+        else:
+            print(f"Error reading voice duration from config.")
+        print(f"Voice gender set to: {voice}")
+
+        if data["voice"]["rate"] and int(data["voice"]["rate"]) is not None:
+            rate = int(data["voice"]["rate"])
+        else:
+            print(f"Error reading rate duration from config.")
+        print(f"Voice rate (words per minute) set to: {rate}")
+
+        if data["voice"]["volume"] and float(data["voice"]["volume"]) is not None:
+            if float(data["voice"]["volume"]) > 1:
+                volume = 1
+            elif float(data["voice"]["volume"]) < 0:
+                volume = 0
+                print("Volume can't be negative. Volume value is set to 0")
+            else:
+                volume = float(data["voice"]["volume"]) 
+        else:
+            print(f"Error reading rate duration from config.")
+        print(f"Voice volume (between 0 - 1.0) set to: {rate}")
+
+        # Init speech engine
+        speech_engine = SpeechHandler(voice, rate, volume)
 
         # Convert delay in milliseconds to seconds
         if data["request"]["delay"] and float(data["request"]["delay"]) is not None:
@@ -140,6 +168,9 @@ def read_config():
             courses[course] = sections
             print()
 
+
+def beep(**kwargs):
+    beepy.beep('coin')
 
 def main():
     read_config()
