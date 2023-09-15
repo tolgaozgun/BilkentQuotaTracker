@@ -9,16 +9,20 @@ import requests
 from bs4 import BeautifulSoup
 import time
 from datetime import datetime
-import winsound
-from win32com.client import Dispatch
+# import winsound
+# from win32com.client import Dispatch
 import json
+import os
 
-speak = Dispatch("SAPI.SpVoice").Speak
+# speak = Dispatch("SAPI.SpVoice").Speak
 
 courses = {}
 frequency = 2500
 duration = 1000
 delay = 1
+
+
+os.system('say "Bilkent Quota Tracker loaded."')
 
 
 def print_with_time(message: str):
@@ -63,7 +67,7 @@ def find_course(course_code: str, section_ids):
     for section_id in section_ids:
         final_sections.append(section_id_filler(section_id))
 
-    URL = f"https://stars.bilkent.edu.tr/homepage/ajax/course.sections.php?COURSE={course_code}&SEMESTER=20222"
+    URL = f"https://stars.bilkent.edu.tr/homepage/ajax/course.sections.php?COURSE={course_code}&SEMESTER=20231"
     response_code = 0
 
     while response_code != 200:
@@ -78,7 +82,7 @@ def find_course(course_code: str, section_ids):
         courses.pop(course_code)
         return
 
-    soup = BeautifulSoup(r.content, 'html5lib')
+    soup = BeautifulSoup(r.content, 'html.parser')
 
     for section in final_sections:
         table_id = f"{course_code}-{section}"
@@ -92,9 +96,9 @@ def find_course(course_code: str, section_ids):
         if quota == 0:
             continue
         else:
-            winsound.Beep(frequency, duration)
             print_with_time(f"Course {table_id} has {quota} quota!")
-            speak(f"Course {table_id} has {quota} quota!")
+            os.system(f'say "Course {table_id} has {quota} quota!"')
+            # speak(f"Course {table_id} has {quota} quota!")
 
 
 def read_config():
